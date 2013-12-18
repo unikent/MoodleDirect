@@ -86,8 +86,8 @@ class turnitintool_commclass {
     function __construct($iUid,$iUfn,$iUln,$iUem,$iUtp,&$iLoaderBar) {
         global $CFG;
         $this->callback=false;
-        $this->apiurl=$CFG->turnitin_apiurl;
-        $this->accountid=$CFG->turnitin_account_id;
+        $this->apiurl=empty($CFG->turnitin_apiurl) ? "" : $CFG->turnitin_apiurl;
+        $this->accountid=empty($CFG->turnitin_account_id) ? "" : $CFG->turnitin_account_id;
         $this->uid=$iUid;
         
         // Convert the email, firstname and lastname to psuedos for students if the option is set in config
@@ -161,9 +161,9 @@ class turnitintool_commclass {
     */
     function disableEmail($submission=false) {
         global $CFG;
-        if ( ($this->utp==1 AND $CFG->turnitin_receiptemail!="1" AND $submission) OR  // If student and submission and sends receipts = no
-             ($this->utp==1 AND $CFG->turnitin_studentemail!="1" AND !$submission) OR // If student and not submission and student emails = no
-             ($this->utp==2 AND $CFG->turnitin_tutoremail!="1") ) {                   // If instructor and instructor emails = no
+        if ( ($this->utp==1 AND isset($CFG->turnitin_receiptemail) AND $CFG->turnitin_receiptemail!="1" AND $submission) OR  // If student and submission and sends receipts = no
+             ($this->utp==1 AND isset($CFG->turnitin_studentemail) AND $CFG->turnitin_studentemail!="1" AND !$submission) OR // If student and not submission and student emails = no
+             ($this->utp==2 AND isset($CFG->turnitin_tutoremail) AND $CFG->turnitin_tutoremail!="1") ) {                     // If instructor and instructor emails = no
             return "1";
         } else {
             return "0";
@@ -462,7 +462,7 @@ class turnitintool_commclass {
      */
     function doLogging($vars,$result) {
         global $CFG;
-        if ( $CFG->turnitin_enablediagnostic AND !empty( $vars ) ) {
+        if ( isset($CFG->turnitin_enablediagnostic) && $CFG->turnitin_enablediagnostic AND !empty( $vars ) ) {
             $this->result=$result;
             // ###### DELETE SURPLUS LOGS #########
             $numkeeps=10;
