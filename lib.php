@@ -295,6 +295,7 @@ function turnitintool_update_instance($turnitintool) {
     $turnitintool->id = $turnitintool->instance;
 
     // Set the checkbox settings for updates
+	$turnitintool->usegrademark     = (isset($turnitintool->usegrademark))  ? $turnitintool->usegrademark : 0;
     $turnitintool->erater_spelling  = (isset($turnitintool->erater_spelling))  ? $turnitintool->erater_spelling : 0;
     $turnitintool->erater_grammar   = (isset($turnitintool->erater_grammar))   ? $turnitintool->erater_grammar : 0;
     $turnitintool->erater_usage     = (isset($turnitintool->erater_usage))     ? $turnitintool->erater_usage : 0;
@@ -606,7 +607,11 @@ function turnitintool_grade_item_update( $turnitintool, $grades=null ) {
             $params['grademax']  = $turnitintool->grade;
             $params['grademin']  = 0;
         } else { // If we aren't using a grade at all
-            $params['gradetype'] = GRADE_TYPE_NONE;
+            if ($turnitintool->usegrademark) {
+                $params['gradetype'] = GRADE_TYPE_NONE;
+            } else {
+                $params['gradetype'] = GRADE_TYPE_TEXT; // allow text comments only
+            }
         }
 
         $lastpart=turnitintool_get_record('turnitintool_parts','turnitintoolid',$turnitintool->id,'','','','','max(dtpost)');
@@ -2913,13 +2918,15 @@ function turnitintool_process_options($cm,$turnitintool,$post) {
     global $CFG, $turnitintool;
     $turnitintool->autosubmission=$post['autosubmission'];
     $turnitintool->shownonsubmission=$post['shownonsubmission'];
+	$turnitintool->usegrademark = 0;
     if (isset($post['usegrademark'])) {
-        $turnitintool->usegrademark=$post['usegrademark'];
+        $turnitintool->usegrademark = $post['usegrademark'];
     }
     $turnitintool->gradedisplay=$post['gradedisplay'];
     $turnitintool->autoupdates=$post['autoupdates'];
     $turnitintool->commentedittime=$post['commentedittime'];
     $turnitintool->commentmaxsize=$post['commentmaxsize'];
+	turnitintool_grade_item_update($turnitintool);
     if (turnitintool_update_record('turnitintool',$turnitintool,false)) {
         return get_string('optionsupdatesaved','turnitintool');
     } else {
