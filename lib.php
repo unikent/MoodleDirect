@@ -793,7 +793,7 @@ function turnitintool_print_overview($courses, &$htmlarray) {
     foreach ($turnitintools as $key => $turnitintool) {
         $now = time();
         $parts=turnitintool_get_records_select('turnitintool_parts','turnitintoolid='.$turnitintool->id.' AND deleted=0','id');
-        $context = get_context_instance(CONTEXT_MODULE, $turnitintool->coursemodule);
+        $context = context_module::instance($turnitintool->coursemodule);
 
         // Get Early and Late Date Boundries for each part of this assignment
         $earlydate=0;
@@ -1113,7 +1113,7 @@ function turnitintool_draw_menu($cm,$do) {
     $tabs[] = new tabobject('intro', $CFG->wwwroot.'/mod/turnitintool/view.php'.'?id='.$cm->id.
                     '&do=intro', get_string('turnitintoolintro','turnitintool'), get_string('turnitintoolintro','turnitintool'), false);
 
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
 
         $tabs[] = new tabobject('submissions', $CFG->wwwroot.'/mod/turnitintool/view.php'.'?id='.$cm->id.'&do=submissions',
                 get_string('submitpaper','turnitintool'), get_string('submitpaper','turnitintool'), false);
@@ -1157,7 +1157,7 @@ function turnitintool_draw_menu($cm,$do) {
  */
 function turnitintool_update_partnames($cm,$turnitintool,$post) {
     global $CFG,$USER;
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         $notice['message']='';
         $error=false;
         $dtstart=make_timestamp(
@@ -1350,7 +1350,7 @@ function turnitintool_delete_part($cm,$turnitintool,$partid) {
     if ($turnitintool->numparts==1) {
         $error=true;
         turnitintool_print_error('onepartdeleteerror','turnitintool',NULL,NULL,__FILE__,__LINE__);
-    } else if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    } else if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
 
         if (turnitintool_is_owner($turnitintool->course)) {
             $owner=$USER;
@@ -1570,7 +1570,7 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
         exit();
     }
 
-    if ($part->dtstart < time() OR has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if ($part->dtstart < time() OR has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         if ( is_callable('format_module_intro') ) {
             $intro=format_module_intro( 'turnitintool', $turnitintool, $cm->id );
         } else {
@@ -1590,7 +1590,7 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
     $table->rows[1] = new stdClass();
     $table->rows[1]->cells=$cells;
 
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     if (has_capability('mod/turnitintool:grade', $context)) {
         unset($cells);
         $cells[0] = new stdClass();
@@ -1621,7 +1621,7 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
             $vars.=':';
         }
         $vars.=$part->id;
-        if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) { // TUTOR ONLY
+        if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) { // TUTOR ONLY
             $param_part=optional_param('part',null,PARAM_CLEAN);
             if (!is_null($param_part) AND $param_part==$part->id) {
                 $output.=turnitintool_partform($cm,$part);
@@ -1637,7 +1637,7 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
     $table->id='submissionTableId';
     $table->class='submissionTable';
 
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) { // DO TUTOR HEADERS
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) { // DO TUTOR HEADERS
         unset($cells);
         $cells[0] = new stdClass();
         $cells[0]->data=get_string('partname','turnitintool');
@@ -1691,7 +1691,7 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
     $row=0;
     foreach($parts as $part) {
         $row++;
-        if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) { // DO TUTOR VIEW
+        if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) { // DO TUTOR VIEW
             $cells[0] = new stdClass();
             $cells[0]->data='<span id="partnametext_'.$part->id.'">'.$part->partname.'</span>';
             $cells[0]->class="cell c0 partcell";
@@ -1800,7 +1800,7 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
  */
 function turnitintool_get_tiitutors($cm,$turnitintool) {
     $return=null;
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         $loaderbar = null;
         $owner=turnitintool_get_owner($turnitintool->course);
         $owneruid=turnitintool_getUID($owner);
@@ -1831,7 +1831,7 @@ function turnitintool_get_tiitutors($cm,$turnitintool) {
  */
 function turnitintool_remove_tiitutor($cm,$turnitintool,$tutor) {
     $return=null;
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         $loaderbar = new turnitintool_loaderbarclass(4);
         $thisuser=turnitintool_get_moodleuser($tutor);
         $thisuid=turnitintool_getUID($thisuser);
@@ -1955,7 +1955,7 @@ function turnitintool_view_tiitutors($cm,$turnitintool,$tutors) {
     $table->rows[0]->cells[0]->data=get_string('turnitintutors','turnitintool');
     $table->rows[0]->cells[1] = new stdClass();
     $table->rows[0]->cells[1]->class='cell c1';
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     $availabletutors=get_users_by_capability($context,'mod/turnitintool:grade','u.id,u.firstname,u.lastname,u.username','','','',0,'',false);
     $tutorselection=get_string('turnitintutorsallenrolled','turnitintool');
     foreach ($tutors->array as $value) {
@@ -2002,7 +2002,7 @@ function turnitintool_view_tiitutors($cm,$turnitintool,$tutors) {
  */
 function turnitintool_add_tiitutor($cm,$turnitintool,$tutor) {
     $return=null;
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         $loaderbar = new turnitintool_loaderbarclass(4);
         $thisuser=turnitintool_get_moodleuser($tutor);
 
@@ -2049,9 +2049,9 @@ function turnitintool_ownerprocess($cm,$turnitintool,$newid) {
     // Firstly Double Check to make sure this user is a tutor on this course
     if ($newid!='NULL') {
 
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
         $isadmin=false;
-        if (has_capability('moodle/site:config',get_context_instance(CONTEXT_SYSTEM))) {
+        if (has_capability('moodle/site:config',context_system::instance())) {
             $isadmin=true;
         }
         $allusers=get_users_by_capability($context, 'mod/turnitintool:grade', "u.id AS id", '', '', '', 0, '', true);
@@ -2230,9 +2230,9 @@ function turnitintool_draw_similarityscore($cm,$turnitintool,$submission) {
         $result=$submission->submission_score;
         $objectid=$submission->submission_objectid;
 
-        if (!is_null($objectid) AND (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) OR $turnitintool->studentreports)) {
+        if (!is_null($objectid) AND (has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) OR $turnitintool->studentreports)) {
 
-            if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+            if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
                 $utp=2;
             } else {
                 $utp=1;
@@ -2284,7 +2284,7 @@ function turnitintool_draw_similarityscore($cm,$turnitintool,$submission) {
 function turnitintool_get_filelink($cm,$turnitintool,$submission,$download=false) {
 
     global $CFG,$USER;
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     if (empty($submission->submission_objectid)) {
         if (is_callable("get_file_storage")) {
             $filelink=$CFG->wwwroot.'/mod/turnitintool/filelink.php?id='.$cm->id.'&sub='.$submission->id;
@@ -2328,7 +2328,7 @@ function turnitintool_view_student_submissions($cm,$turnitintool) {
 
     $i=0;
 
-    if (!has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (!has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         // If a grading user (Tutor then this list is not needed)
         if (!$submissions = turnitintool_get_records_select('turnitintool_submissions','userid='.$USER->id.' AND turnitintoolid='.$turnitintool->id,'id')) {
             $output.=turnitintool_box_start('generalbox boxwidthwide boxaligncenter centertext eightyfive', 'nosubmissions',true);
@@ -2495,14 +2495,14 @@ function turnitintool_view_student_submissions($cm,$turnitintool) {
                 $rep = array('\n','\r');
                 if (empty($submission->submission_objectid)) {
                     $confirm=' onclick="return confirm(\''.str_replace($fnd, $rep, get_string('deleteconfirm','turnitintool')).'\');"';
-                } else if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+                } else if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
                     $confirm=' onclick="return confirm(\''.str_replace($fnd, $rep, get_string('turnitindeleteconfirm','turnitintool')).'\')"';
                 } else {
                     $confirm=' onclick="return confirm(\''.str_replace($fnd, $rep, get_string('studentdeleteconfirm','turnitintool')).'\')"';
                 }
 
                 if (empty($submission->submission_objectid)
-                        OR has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+                        OR has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
                     $delete='<a href="'.$CFG->wwwroot.'/mod/turnitintool/view.php'.'?id='.$cm->id.'&delete='.$submission->id.
                             '&do='.$param_do.'"'.$confirm.' title="'.get_string('deletesubmission','turnitintool').
                             '"><img src="pix/delete.png" alt="'.get_string('deletesubmission','turnitintool').'" class="tiiicons" /></a>';
@@ -2658,7 +2658,7 @@ function turnitintool_view_notes($cm,$turnitintool,$view,$post) {
         turnitintool_print_error('submissiongeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
         exit();
     }
-    if ($submission->userid==$USER->id OR has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if ($submission->userid==$USER->id OR has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         if ($comments=turnitintool_get_records_select('turnitintool_comments',"submissionid=".$submission->id." AND deleted=0")) {
             foreach ($comments as $comment) {
 
@@ -2670,7 +2670,7 @@ function turnitintool_view_notes($cm,$turnitintool,$view,$post) {
                 } else {
                     $output.=turnitintool_box_start('generalbox boxwidthwide boxaligncenter eightyfive','notes',true);
 
-                    if ($submission->submission_unanon OR !has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+                    if ($submission->submission_unanon OR !has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
                         $commentname=$commentuser->firstname.' '.$commentuser->lastname;
                     } else {
                         $commentname=get_string('anonenabled','turnitintool');
@@ -2685,7 +2685,7 @@ function turnitintool_view_notes($cm,$turnitintool,$view,$post) {
                     <div class="clearBlock">&nbsp;</div>';
                     if ($comment->userid==$USER->id AND ($comment->dateupdated>=time()-$turnitintool->commentedittime
                                     OR
-                                    has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)))) {
+                                    has_capability('mod/turnitintool:grade', context_module::instance($cm->id)))) {
                         $fnd = array("\n","\r");
                         $rep = array('\n','\r');
                         $output.='<div class="commentBottom">
@@ -2700,7 +2700,7 @@ function turnitintool_view_notes($cm,$turnitintool,$view,$post) {
                         <input name="comment" value="'.$comment->id.'" type="hidden" />
                         <input name="submitted" value="'.get_string('editcomment','turnitintool').'" type="submit" />
                         </form>';
-                        if (!has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+                        if (!has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
                             $output.='<span class="editNotice">'.get_string('edituntil','turnitintool').' '.userdate($comment->dateupdated+$turnitintool->commentedittime,get_string('strftimerecentfull','langconfig')).'</span>';
                         }
                         $output.='</div>
@@ -2741,7 +2741,7 @@ function turnitintool_addedit_notes($cm,$turnitintool,$view,$post,$notice) {
         turnitintool_print_error('submissiongeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
         exit();
     }
-    if ($submission->userid==$USER->id OR has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if ($submission->userid==$USER->id OR has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         $title=get_string('addeditcomment','turnitintool');
         $action='<input name="action" value="add" type="hidden" />';
         if (isset($post['action']) AND ($post['action']=='view' OR $post['action']=='edit')) {
@@ -2819,9 +2819,9 @@ function turnitintool_process_notes($cm,$turnitintool,$view,$post) {
         turnitintool_print_error('submissiongeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
         exit();
     }
-    if ($submission->userid==$USER->id OR has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) { // Revalidate user
+    if ($submission->userid==$USER->id OR has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) { // Revalidate user
 
-        $isgrader=has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id));
+        $isgrader=has_capability('mod/turnitintool:grade', context_module::instance($cm->id));
 
         if (isset($post["action"]) AND $post["action"]!="view") {
             $comment=new object();
@@ -3275,7 +3275,7 @@ function turnitintool_view_all_submissions($cm,$turnitintool,$orderby='1') {
     $param_reason=optional_param('reason',array(),PARAM_CLEAN);
 
     $module_group = turnitintool_module_group( $cm );
-    $context = get_context_instance(CONTEXT_COURSE, $turnitintool->course);
+    $context = context_course::instance($turnitintool->course);
     $studentusers = get_users_by_capability($context,'mod/turnitintool:submit','u.id,u.firstname,u.lastname','','','',$module_group,'',false);
     $studentuser_array = array_keys($studentusers);
     $scale=turnitintool_get_record('scale','id',$turnitintool->grade*-1);
@@ -3913,7 +3913,7 @@ function turnitintool_draw_submission_table($cm, $turnitintool, $input=array()) 
 function turnitintool_reloadinbox_row( $cm, $turnitintool, $objectid ) {
 
     // Must be instructor on the class
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) OR $turnitintool->studentreports OR $trigger>0) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) OR $turnitintool->studentreports OR $trigger>0) {
 
         // Get the current submission values from the database
         if ( !$submissions = turnitintool_get_records_select('turnitintool_submissions','submission_objectid='.$objectid.' AND turnitintoolid='.$turnitintool->id,'id DESC') ) {
@@ -4058,7 +4058,7 @@ function turnitintool_enroll_student($cm,$turnitintool,$userid) {
         echo json_encode( $response );
         exit();
     }
-    if ( !has_capability( 'mod/turnitintool:submit', get_context_instance( CONTEXT_MODULE, $cm->id ) ) ) {
+    if ( !has_capability( 'mod/turnitintool:submit', context_module::instance($cm->id) ) ) {
         $reason=get_string('permissiondeniederror','turnitintool');
         $response["status"] = 'error';
         $response["description"] = get_string('updateerror','turnitintool').': '.get_string('turnitinenrollstudents','turnitintool');
@@ -4122,7 +4122,7 @@ function turnitintool_enroll_student($cm,$turnitintool,$userid) {
  */
 function turnitintool_enroll_all_students($cm,$turnitintool) {
 
-    $context=get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context=context_module::instance($cm->id);
     $courseusers=get_users_by_capability($context, 'mod/turnitintool:submit', '', '', '', '', 0, '', false);
     $courseusers=(!is_array($courseusers)) ? array() : $courseusers;
 
@@ -4198,7 +4198,7 @@ function turnitintool_enroll_all_students($cm,$turnitintool) {
 function turnitintool_dogradeoutput($cm,$turnitintool,$submission,$duedate,$postdate,$maxmarks,$textcolour='#666666',$background='transparent',$gradeable=true) {
     global $CFG, $USER;
 
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         $utp=2;
     } else {
         $utp=1;
@@ -4414,7 +4414,7 @@ function turnitintool_update_all_report_scores($cm,$turnitintool,$trigger,$loade
         }
         // ]]]]
 
-        if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) OR $turnitintool->studentreports OR $trigger>0) {
+        if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) OR $turnitintool->studentreports OR $trigger>0) {
 
             $total=count($parts);
             $loaderbar = ( is_null( $loaderbar ) ) ? new turnitintool_loaderbarclass( 0 ) : $loaderbar;
@@ -4435,7 +4435,7 @@ function turnitintool_update_all_report_scores($cm,$turnitintool,$trigger,$loade
                 $ids=array();
             }
             
-            $context = get_context_instance( CONTEXT_COURSE, $turnitintool->course );
+            $context = context_course::instance($turnitintool->course);
             $studentusers = get_users_by_capability($context,'mod/turnitintool:submit','u.id,u.firstname,u.lastname','','','',0,'',false);
             $studentuser_array = array_keys($studentusers);
             $users_string = join( $studentuser_array, "," );
@@ -4647,14 +4647,14 @@ function turnitintool_delete_submission($cm,$turnitintool,$userid,$submission) {
     // Or If resubmissions are allowed -- OK [[[[
     if (empty($submission->submission_objectid)
             OR
-            has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))
+            has_capability('mod/turnitintool:grade', context_module::instance($cm->id))
             OR
             $turnitintool->reportgenspeed==1
     ) {
 
         // Trap any possible attempt to delete someone elses submission unless they are a tutor
         // Should not happen but trapping is easy [[[[
-        if ($userid!=$submission->userid AND !has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+        if ($userid!=$submission->userid AND !has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
             turnitintool_print_error('permissiondeniederror','turnitintool',NULL,NULL,__FILE__,__LINE__);
             exit();
         }
@@ -4670,7 +4670,7 @@ function turnitintool_delete_submission($cm,$turnitintool,$userid,$submission) {
         add_to_log($turnitintool->course, "turnitintool", "delete submission", "view.php?id=$cm->id", "User deleted submission '$submission->submission_title'", "$cm->id");
 
         // Only do this at this point if the user is a grader OR resubmissions allowed [[[[
-        if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))
+        if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))
                 OR
                 $turnitintool->reportgenspeed==1) {
 
@@ -4751,7 +4751,7 @@ function turnitintool_update_choice_cookie($turnitintool) {
         } else {
             $nmsubmissions = turnitintool_count_records('turnitintool_submissions','submission_part',$userCookieArray[$i],'turnitintoolid',$turnitintool->id,'userid',0);
             $cm=get_coursemodule_from_instance('turnitintool',$turnitintool->id,$turnitintool->course);
-            $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+            $context = context_module::instance($cm->id);
             $studentusers=get_users_by_capability($context,'mod/turnitintool:submit','u.id','','','','','',false);
             $numusers=(!is_array($studentusers)) ? 0 : count($studentusers);
             $numsubmissions=$nmsubmissions+$numusers;
@@ -4807,7 +4807,7 @@ function turnitintool_cansubmit($cm,$turnitintool,$user) { // Returns an array o
 
     $return=false;
 
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     $studentusers=get_users_by_capability($context, 'mod/turnitintool:submit', 'u.id,u.firstname,u.lastname', 'u.lastname', '', '', turnitintool_module_group($cm), '', false);
 
     // Count the number of parts still available to be submitted from start date and end date
@@ -4822,7 +4822,7 @@ function turnitintool_cansubmit($cm,$turnitintool,$user) { // Returns an array o
     $numpartsavailable=count($partsavailable);
 
     // Check to see if the submitter is a tutor / grader
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         $return=array();
         foreach ($partsavailable as $partavailable) {
             if (is_array($studentusers)) {
@@ -4882,7 +4882,7 @@ function turnitintool_view_submission_form($cm,$turnitintool,$submissionid=NULL)
 
         $output=turnitintool_box_start('generalbox boxwidthwide boxaligncenter eightyfive', 'submitbox',true);
 
-        if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+        if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
             $submissions=turnitintool_get_records_select('turnitintool_submissions','turnitintoolid='.$turnitintool->id);
         } else {
             $submissions=turnitintool_get_records_select('turnitintool_submissions','userid='.$USER->id.' AND turnitintoolid='.$turnitintool->id);
@@ -4978,11 +4978,11 @@ function turnitintool_view_submission_form($cm,$turnitintool,$submissionid=NULL)
         $table->rows[0] = new stdClass();
         $table->rows[0]->class='r0';
         $table->rows[0]->cells=$cells;
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
         if ($param_type!=0) {
             $submissiontitle=optional_param('submissiontitle','',PARAM_CLEAN);
             $disableform=false;
-            if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+            if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
                 $utype="tutor";
                 // If tutor submitting on behalf of student
                 unset($cells);
@@ -5192,7 +5192,7 @@ function turnitintool_view_submission_form($cm,$turnitintool,$submissionid=NULL)
         } else {
             // Due date has not passed
             // Count the number of students (numusers) enrolled on this course
-            $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+            $context = context_module::instance($cm->id);
             $users=get_users_by_capability($context,'mod/turnitintool:submit','u.id','','','',turnitintool_module_group($cm),'',false);
             $numusers=(!is_array($users)) ? 0 : count($users);
             if ($numusers>0) {
@@ -5477,7 +5477,7 @@ function turnitintool_dofileupload($cm,$turnitintool,$userid,$post) {
             }
         }
 
-        if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) AND !$turnitintool->autosubmission) {
+        if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) AND !$turnitintool->autosubmission) {
             turnitintool_redirect($CFG->wwwroot.'/mod/turnitintool/view.php?id='.$cm->id.'&do=allsubmissions');
             exit();
         } else if (!$turnitintool->autosubmission) {
@@ -5622,7 +5622,7 @@ function turnitintool_dotextsubmission($cm,$turnitintool,$userid,$post) {
 
         $notice["subid"]=$submitobject->id;
 
-        if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) AND !$turnitintool->autosubmission) {
+        if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) AND !$turnitintool->autosubmission) {
             turnitintool_redirect($CFG->wwwroot.'/mod/turnitintool/view.php?id='.$cm->id.'&do=allsubmissions');
             exit();
         } else if (!$turnitintool->autosubmission) {
@@ -5804,7 +5804,7 @@ function turnitintool_upload_submission($cm,$turnitintool,$submission) {
     
     $tii->endSession();
 
-    if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if (has_capability('mod/turnitintool:grade', context_module::instance($cm->id))) {
         turnitintool_redirect($CFG->wwwroot.'/mod/turnitintool/view.php?id='.$cm->id.'&do=allsubmissions');
         exit();
     } else {
@@ -6406,7 +6406,7 @@ function turnitintool_url_jumpto($userid,$jumppage,$turnitintool,$utp=null,$obje
     global $CFG;
     $thisuser=turnitintool_get_moodleuser($userid,NULL,__FILE__,__LINE__);
     $cm=get_coursemodule_from_instance("turnitintool", $turnitintool->id, $turnitintool->course);
-    if ( $utp > 1 AND !has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) ) {
+    if ( $utp > 1 AND !has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) ) {
         turnitintool_print_error('permissiondeniederror','turnitintool',NULL,NULL,__FILE__,__LINE__);
     }
     $loaderbar = NULL;
@@ -6990,7 +6990,7 @@ function turnitintool_footer($course = NULL, $usercourse = NULL, $return = false
 */
 function turnitintool_duplicatewarning($cm, $turnitintool) {
     global $CFG;
-    if ( has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) ) {
+    if ( has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) ) {
         $parts = turnitintool_get_records('turnitintool_parts','turnitintoolid',$turnitintool->id);
         $dups = array();
         $output = '';

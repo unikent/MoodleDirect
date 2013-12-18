@@ -314,7 +314,7 @@ $graderdos=array('allsubmissions','options','changeowner','tutors');
 if (!in_array($do,$studentdos) AND !in_array($do,$graderdos)) {
     turnitintool_print_error('dorequesterror','turnitintool');
     exit();
-} else if (!has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) AND in_array($do,$graderdos)) {
+} else if (!has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) AND in_array($do,$graderdos)) {
     turnitintool_print_error('permissiondeniederror','turnitintool');
     exit();
 }
@@ -337,8 +337,8 @@ if ($do=='intro') {
 }
 
 if ($do=='submissions') {
-    if ( !has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $cm->id)) 
-         AND !has_capability('mod/turnitintool:submit', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+    if ( !has_capability('mod/turnitintool:grade', context_module::instance($cm->id)) 
+         AND !has_capability('mod/turnitintool:submit', context_module::instance($cm->id))) {
         turnitintool_print_error('permissiondeniederror','turnitintool');
         exit();
     } else {

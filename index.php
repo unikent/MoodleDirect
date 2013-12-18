@@ -137,7 +137,7 @@
         $part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid='.$turnitintool->id.' AND deleted=0','MIN(dtstart) AS dtstart');
         $dtstart = '<span'.$dimmed.'>'.userdate($part->dtstart,get_string('strftimedatetimeshort','langconfig')).'</span>';
         $partcount=turnitintool_count_records_select('turnitintool_parts','turnitintoolid='.$turnitintool->id.' AND deleted=0');
-		if (has_capability('mod/turnitintool:grade', get_context_instance(CONTEXT_MODULE, $turnitintool->coursemodule))) {
+		if (has_capability('mod/turnitintool:grade', context_module::instance($turnitintool->coursemodule))) {
 	        $submissioncount='<a'.$dimmed.' href="view.php?id='.$turnitintool->coursemodule.'&do=allsubmissions">'.turnitintool_count_records('turnitintool_submissions','turnitintoolid',$turnitintool->id).'</a>';
 		} else {
 			$submissioncount='<a'.$dimmed.' href="view.php?id='.$turnitintool->coursemodule.'&do=submissions">'.turnitintool_count_records_select('turnitintool_submissions','turnitintoolid='.$turnitintool->id.' AND userid='.$USER->id).'</a>';
