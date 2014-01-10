@@ -60,7 +60,7 @@ class mod_turnitintool_mod_form extends moodleform_mod {
         $suboptions = array( 0 => get_string('namedparts','turnitintool'), 1 => get_string('portfolio','turnitintool'));
         
         $mform->addElement('hidden','portfolio',0);
-        $mform->setType('portfolio', PARAM_INT);
+        $mform->setType('portfolio', PARAM_RAW);
         
         $maxtii=20971520;
         if ($CFG->maxbytes>$maxtii) {
@@ -86,17 +86,16 @@ class mod_turnitintool_mod_form extends moodleform_mod {
         if ( !is_callable(array($this,'standard_grading_coursemodule_elements')) ) {
             $mform->addElement('modgrade', 'grade', get_string('overallgrade', 'turnitintool'));
             turnitintool_modform_help_icon('grade', 'overallgrade', 'turnitintool', $mform);
-            $mform->setDefault('grade', $CFG->turnitin_default_grade);
         }
 
         $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
 
         $mform->addElement('hidden','defaultdtstart',time());
-        $mform->setType('defaultdtstart', PARAM_INT);
+        $mform->setType('defaultdtstart', PARAM_RAW);
         $mform->addElement('hidden','defaultdtdue',strtotime('+7 days'));
-        $mform->setType('defaultdtdue', PARAM_INT);
+        $mform->setType('defaultdtdue', PARAM_RAW);
         $mform->addElement('hidden','defaultdtpost',strtotime('+7 days'));
-        $mform->setType('defaultdtpost', PARAM_INT);
+        $mform->setType('defaultdtpost', PARAM_RAW);
         
         if (isset($this->_cm->id)) {
             $turnitintool=turnitintool_get_record("turnitintool", "id", $this->_cm->instance);
@@ -130,10 +129,12 @@ class mod_turnitintool_mod_form extends moodleform_mod {
         
         $mform->addElement('header', 'general', get_string('advancedoptions', 'turnitintool'));
         $mform->addElement('select', 'allowlate', get_string('allowlate', 'turnitintool'), $ynoptions);
+        turnitintool_modform_help_icon('allowlate', 'allowlate', 'turnitintool', $mform);
         $mform->setDefault('allowlate', $CFG->turnitin_default_allowlate);
         
         $genoptions = array( 0 => get_string('genimmediately1','turnitintool'), 1 => get_string('genimmediately2','turnitintool'), 2 => get_string('genduedate','turnitintool'));
         $mform->addElement('select', 'reportgenspeed', get_string('reportgenspeed', 'turnitintool'), $genoptions);
+        turnitintool_modform_help_icon('reportgenspeed', 'reportgenspeed', 'turnitintool', $mform);
         $mform->setDefault('reportgenspeed', $CFG->turnitin_default_reportgenspeed);
         
         $suboptions = array( 0 => get_string('norepository','turnitintool'), 1 => get_string('standardrepository','turnitintool'));
@@ -143,15 +144,19 @@ class mod_turnitintool_mod_form extends moodleform_mod {
         }
         
         $mform->addElement('select', 'submitpapersto', get_string('submitpapersto', 'turnitintool'), $suboptions);
+        turnitintool_modform_help_icon('submitpapersto', 'submitpapersto', 'turnitintool', $mform);
         $mform->setDefault('submitpapersto', $CFG->turnitin_default_submitpapersto);
         
         $mform->addElement('select', 'spapercheck', get_string('spapercheck', 'turnitintool'), $ynoptions);
+        turnitintool_modform_help_icon('spapercheck', 'spapercheck', 'turnitintool', $mform);
         $mform->setDefault('spapercheck', $CFG->turnitin_default_spapercheck);
         
         $mform->addElement('select', 'internetcheck', get_string('internetcheck', 'turnitintool'), $ynoptions);
+        turnitintool_modform_help_icon('internetcheck', 'internetcheck', 'turnitintool', $mform);
         $mform->setDefault('internetcheck', $CFG->turnitin_default_internetcheck);
 
         $mform->addElement('select', 'journalcheck', get_string('journalcheck', 'turnitintool'), $ynoptions);
+        turnitintool_modform_help_icon('journalcheck', 'journalcheck', 'turnitintool', $mform);
         $mform->setDefault('journalcheck', $CFG->turnitin_default_journalcheck);
 
         if ($numsubs>0) {
@@ -165,8 +170,8 @@ class mod_turnitintool_mod_form extends moodleform_mod {
             $staticout=(isset($turnitintool->excludequoted) AND $turnitintool->excludequoted)
                     ? get_string('yes', 'turnitintool') : get_string('no', 'turnitintool');
             $mform->addElement('static', 'static', get_string('excludequoted', 'turnitintool'), $staticout);
-            $mform->addElement('hidden', 'excludequoted', $turnitintool->excludequoted);
             $mform->setType('excludequoted', PARAM_RAW);
+            $mform->addElement('hidden', 'excludequoted', $turnitintool->excludequoted);
 
             $staticout=(isset($turnitintool->excludetype) AND $turnitintool->excludetype==1)
                     ? get_string('excludewords', 'turnitintool') : get_string('excludepercent', 'turnitintool');
@@ -174,18 +179,21 @@ class mod_turnitintool_mod_form extends moodleform_mod {
                     ? get_string('nolimit', 'turnitintool') : $turnitintool->excludevalue.' '.$staticout;
             $mform->addElement('static', 'static', get_string('excludevalue', 'turnitintool'), $staticval);
             $mform->addElement('hidden', 'excludevalue', $turnitintool->excludevalue);
-            $mform->setType('excludevalue', PARAM_INT);
+            $mform->setType('excludevalue', PARAM_RAW);
             $mform->addElement('hidden', 'excludetype', $turnitintool->excludetype);
             $mform->setType('excludetype', PARAM_RAW);
 
         } else {
             $mform->addElement('select', 'excludebiblio', get_string('excludebiblio', 'turnitintool'), $ynoptions);
             $mform->setDefault('excludebiblio', $CFG->turnitin_default_excludebiblio);
+            turnitintool_modform_help_icon('excludebiblio', 'excludebiblio', 'turnitintool', $mform);
 
             $mform->addElement('select', 'excludequoted', get_string('excludequoted', 'turnitintool'), $ynoptions);
             $mform->setDefault('excludequoted', $CFG->turnitin_default_excludequoted);
+            turnitintool_modform_help_icon('excludequoted', 'excludequoted', 'turnitintool', $mform);
 
             $mform->addElement('text', 'excludevalue', get_string('excludevalue', 'turnitintool'), array('size'=>'12'));
+            turnitintool_modform_help_icon('excludevalue', 'excludevalue', 'turnitintool', $mform);
             $mform->setType('excludevalue', PARAM_RAW);
             $input = new stdClass();
             $input->length=9;
@@ -199,7 +207,6 @@ class mod_turnitintool_mod_form extends moodleform_mod {
 
             $mform->addElement('select', 'excludetype', '', $typeoptions);
             $mform->setDefault('excludetype', 1);
-            $mform->setType('excludevalue', PARAM_INT);
         }
         
         if ( isset($CFG->turnitin_useerater) && $CFG->turnitin_useerater=='1') {
@@ -216,6 +223,7 @@ class mod_turnitintool_mod_form extends moodleform_mod {
                                         'en'    => get_string('erater_dictionary_en','turnitintool')
                                     );
             $mform->addElement('select', 'erater', get_string('erater', 'turnitintool'), $ynoptions);
+            turnitintool_modform_help_icon('erater', 'erater', 'turnitintool', $mform);
             $mform->setDefault('erater', 0);
             
             $mform->addElement('select', 'erater_handbook', get_string('erater_handbook', 'turnitintool'), $handbook_options);
@@ -227,6 +235,7 @@ class mod_turnitintool_mod_form extends moodleform_mod {
             $mform->disabledIf('erater_dictionary','erater', 'eq', 0);
             
             $mform->addElement('checkbox', 'erater_spelling', get_string('erater_categories', 'turnitintool'), " ".get_string('erater_spelling', 'turnitintool'));
+            turnitintool_modform_help_icon('erater_spelling', 'erater_spelling', 'turnitintool', $mform);
             $mform->setDefault('erater_spelling', false);
             $mform->disabledIf('erater_spelling','erater', 'eq', 0);
             
@@ -250,15 +259,16 @@ class mod_turnitintool_mod_form extends moodleform_mod {
 
         if ( isset($CFG->turnitin_transmatch) && $CFG->turnitin_transmatch=='1') {
             $mform->addElement( 'select', 'transmatch', get_string('transmatch', 'turnitintool'), $ynoptions );
+            turnitintool_modform_help_icon('transmatch', 'transmatch', 'turnitintool', $mform);
             $mform->setType('transmatch', PARAM_BOOL);
             $mform->setDefault( 'transmatch', false);
         } else {
             $mform->addElement( 'hidden', 'transmatch', 0 );
-            $mform->setType('transmatch', PARAM_BOOL);
+            $mform->setType('transmatch', PARAM_RAW);
         }
         
         $mform->addElement('hidden','ownerid',NULL);
-        $mform->setType('ownerid', PARAM_INT);
+        $mform->setType('ownerid', PARAM_RAW);
 
         $features = new stdClass;
         $features->groups = true;
@@ -268,9 +278,17 @@ class mod_turnitintool_mod_form extends moodleform_mod {
         if ( is_callable(array($this,'standard_grading_coursemodule_elements')) ) {
             $this->standard_grading_coursemodule_elements();
         }
-        
+
+        // Set the default grade for the assignment
+        // This will set the default grad for each part too
+        if ( isset($CFG->turnitin_default_grade) ) {
+            $mform->setDefault('grade', $CFG->turnitin_default_grade);
+        }
+
         $this->standard_coursemodule_elements($features);
         $this->add_action_buttons();
 
     }
 }
+
+/* ?> */
