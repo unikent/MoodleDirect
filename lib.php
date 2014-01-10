@@ -4637,7 +4637,6 @@ function turnitintool_update_all_report_scores($cm,$turnitintool,$trigger,$loade
                     $param_ajax=0;
                     exit();
                 }
-                echo "<script>alert('James is fat 3')</script>";
                 return false;
             }
 
@@ -5613,8 +5612,6 @@ function turnitintool_dotextsubmission($cm,$turnitintool,$userid,$post) {
     if (isset($checksubmission->id) AND $turnitintool->reportgenspeed>0) {
         $resubmission=true;
     }
-
-    echo "test";
 
     if ($resubmission AND $checksubmission->dtdue<time()) {
         turnitintool_print_error('alreadysubmitted','turnitintool',NULL,NULL,__FILE__,__LINE__);
