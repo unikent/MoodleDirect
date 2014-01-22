@@ -162,7 +162,7 @@ if ($ADMIN->fulltree) {
                        1 => get_string('yes', 'turnitintool')
                      );
 
-    if ( $CFG->turnitin_useanon ) {
+    if ( isset($CFG->turnitin_useanon) && $CFG->turnitin_useanon ) {
         $settings->add(new admin_setting_configselect('turnitin_default_anon', get_string('anon','turnitintool'),
                         '', 0, $ynoptions ));
     }
