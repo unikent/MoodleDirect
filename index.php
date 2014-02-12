@@ -9,8 +9,6 @@
     if (isset($PAGE) AND is_callable(array($PAGE->requires, 'js'))) { // Are we using new moodle or old?
         $jsurl = new moodle_url($CFG->wwwroot.'/mod/turnitintool/scripts/turnitintool.js');
         $PAGE->requires->js($jsurl,true);
-        $cssurl = new moodle_url($CFG->wwwroot.'/mod/turnitintool/scripts/styles.css');
-        $PAGE->requires->css($cssurl);
     } else {
         require_js($CFG->wwwroot.'/mod/turnitintool/scripts/turnitintool.js');
     }
