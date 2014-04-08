@@ -587,9 +587,9 @@ function turnitintool_update_instance($turnitintool) {
             AND '.$DB->sql_compare_text('instance').' = :id
             AND '.$DB->sql_compare_text('name').' = :name';
         } else {
-            $deletewhere = 'modulename = :modulename
-            AND instance = :id
-            AND name = :name';
+            $deletewhere = 'modulename = \'turnitintool\'
+            AND instance = \''.$turnitintool->id.'\'
+            AND name = \''.$name.'\'';
         }
         turnitintool_delete_records_select('event', $deletewhere, array('modulename' => 'turnitintool', 'id' => $turnitintool->id, 'name' => $name));
 
@@ -2272,7 +2272,8 @@ function turnitintool_draw_similarityscore($cm,$turnitintool,$submission) {
             }
 
             $thisuser=$USER;
-            if ((!is_null($result) AND !empty($result)) OR $result=="0") {
+
+            if ((!is_null($result) AND !empty($result) AND $result != "-2") OR $result=="0") {
                 $style=turnitintool_percent_to_gradpos($result);
                 $style2="";
                 $result.='%';
@@ -2285,6 +2286,11 @@ function turnitintool_draw_similarityscore($cm,$turnitintool,$submission) {
                 $score='<div class="origLink"><a href="'.$reportlink.'" target="_blank" title="'.get_string('viewreport','turnitintool').
                         '" class="scoreLink" onclick="screenOpen(\''.$reportlink.'\',\''.$submission->id.'\',\''.
                         $turnitintool->autoupdates.'\');return false;"><span class="scoreBox"'.$style2.'>'.$result.'<span class="scoreColor"'.$style.'>'.$transmatch.'</span></span></a></div>';
+            } elseif($result == -2) {
+                $color='#FCFCFC';
+                $style=' style="background-color: '.$color.';text-align: center;"';
+                $style2=' style="padding: 0px;"';
+                $score='<div class="origLink">--</div>';
             } else {
                 $color='#FCFCFC';
                 $style=' style="background-color: '.$color.';text-align: center;"';
@@ -3806,7 +3812,7 @@ $output = "
     var users = ".json_encode($studentuser_array).";
     var message = '".get_string('turnitinenrollstudents','turnitintool')."';
     jQuery(document).ready(function($) {
-        $.inboxTable.init( '".$cm->id."', ".$displayusi.", ".turnitintool_datatables_strings()." );
+        $.inboxTable.init( '".$cm->id."', ".$displayusi.", ".turnitintool_datatables_strings().", '".get_string('strftimedatetimeshort','langconfig')."' );
         jQuery('#loader').css( 'display', 'none' );
         $sessionrefresh
     });
@@ -4539,7 +4545,7 @@ function turnitintool_update_all_report_scores($cm,$turnitintool,$trigger,$loade
                         $insert->submission_part=$part->id;
                         $insert->submission_title=$value["title"];
                         $insert->submission_type=1;
-                        $insert->submission_filename=str_replace(" ","_",$value["title"]).'.doc';
+                        $insert->submission_filename=str_replace(array("&#39;","&rsquo;","&lsquo;","'"," "),"_",$value["title"]).'.doc';
                         $insert->submission_objectid=$key;
                         $insert->submission_score=$value["overlap"];
                         if ( $value["overlap"] !== '0' && empty( $value["overlap"] ) ) {
@@ -5362,8 +5368,8 @@ function turnitintool_checkforsubmission($cm,$turnitintool,$partid,$userid) {
             $subinsert['userid']=$userid;
             $subinsert['turnitintoolid']=$turnitintool->id;
             $subinsert['submission_part']=$part->id;
-            $subinsert['submission_title']=$sub_object['title'];
             $subinsert['submission_type']=1;
+            $subinsert['submission_title']=$sub_object['title'];
             $subinsert['submission_filename']=str_replace(" ","_",$sub_object['title']).'.doc';
             $subinsert['submission_objectid']=$key;
             $subinsert['submission_score']=$sub_object['overlap'];
@@ -5433,14 +5439,6 @@ function turnitintool_dofileupload($cm,$turnitintool,$userid,$post) {
 
     if (empty($_FILES['submissionfile']['name'])) {
         $notice["error"].=get_string('submissionfileerror','turnitintool').'<br />';
-        $error=true;
-    }
-
-    $allowed=array('doc','docx','rtf','txt','pdf','htm','html','odt','hwp','ps','wpd', 'ppt', 'pptx', 'ppsx', 'pps');
-    $explode = explode('.',$_FILES['submissionfile']['name']);
-    $pop = array_pop($explode);
-    if (!in_array($pop,$allowed)) {
-        $notice["error"].=get_string('submissionfiletypeerror','turnitintool',join(', ',$allowed)).'<br />';
         $error=true;
     }
 
@@ -5601,7 +5599,7 @@ function turnitintool_dotextsubmission($cm,$turnitintool,$userid,$post) {
 
     $checksubmission=turnitintool_checkforsubmission($cm,$turnitintool,$post['submissionpart'],$userid);
 
-    if (!$error AND isset($checksubmission->id) AND $turnitintool->reportgenspeed>0) {
+    if (!$error AND isset($checksubmission->id) AND $turnitintool->reportgenspeed==0) {
         // Kill the script here as we do not want double errors
         // We only get here if there are no other errors
         turnitintool_print_error('alreadysubmitted','turnitintool',NULL,NULL,__FILE__,__LINE__);
@@ -5783,6 +5781,12 @@ function turnitintool_upload_submission($cm,$turnitintool,$submission) {
     if (is_callable("get_file_storage")) {
         $fs = get_file_storage();
         $file = $fs->get_file($cm->id,'mod_turnitintool','submission',$submission->id,'/',$submission->submission_filename);
+        if (!is_object($file)) {
+            turnitintool_activitylog("SUBID: ".$submission->id." File not found on disk in Moodle, this submission will be deleted","SUB_DELETED");
+            turnitintool_delete_records('turnitintool_submissions','id',$submission->id);
+            turnitintool_print_error('filenotfound','turnitintool',NULL,NULL,__FILE__,__LINE__);
+            exit();
+        }
         $tempname = turnitintool_tempfile('_'.$submission->submission_filename);
         $tempfile=fopen($tempname,"w");
         fwrite($tempfile,$file->get_content());
@@ -5857,6 +5861,13 @@ function turnitintool_upload_submission($cm,$turnitintool,$submission) {
     $update->id=$submission->id;
 
     if (!turnitintool_update_record('turnitintool_submissions',$update)) {
+        turnitintool_print_error('submissionupdateerror','turnitintool',NULL,NULL,__FILE__,__LINE__);
+        exit();
+    }
+
+    // At this point the submission has been made - lock the assignment setting for anon marking
+    $turnitintool->submitted=1;
+    if(!turnitintool_update_record('turnitintool',$turnitintool)){
         turnitintool_print_error('submissionupdateerror','turnitintool',NULL,NULL,__FILE__,__LINE__);
         exit();
     }
@@ -6713,7 +6724,8 @@ function turnitintool_update_record($table,$dataobject) {
     if (is_callable(array($DB,'update_record'))) {
         return $DB->update_record($table,$dataobject);
     } else {
-        return update_record($table,$dataobject);
+        $cleanobj = turnitintool_cleanobject($dataobject);
+        return update_record($table,$cleanobj);
     }
 }
 /**
@@ -6732,8 +6744,26 @@ function turnitintool_insert_record($table,$dataobject,$returnid=true,$primaryke
     if (is_callable(array($DB,'insert_record'))) {
         return $DB->insert_record($table,$dataobject,$returnid,$primarykey);
     } else {
-        return insert_record($table,$dataobject,$returnid,$primarykey);
+        $cleanobj = turnitintool_cleanobject($dataobject);
+        return insert_record($table,$cleanobj,$returnid,$primarykey);
     }
+}
+/**
+ * Removes single quotes from strings being written to the database
+ * Designed to remove database issues in Moodle 1.9 builds
+ *
+ * @param object $dataobject The object that we want to clean
+ * @return object The cleaned object
+ */
+function turnitintool_cleanobject( $dataobject ) {
+    foreach ($dataobject as &$value) {
+        // Prevents issue with apostrophes being escaped in Moodle 1.9
+        if(substr($value, -1) == "'"){
+            $value = substr($value, 0, -2);
+        }
+        $value = str_replace(array("‘","’","‛","'","&#39;","&lsquo;","&rsquo;","`"), "", $value);
+    }
+    return $dataobject;
 }
 /**
  * Abstracted version of delete_records_select() to work with Moodle 1.8 through 2.0
