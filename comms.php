@@ -86,8 +86,8 @@ class turnitintool_commclass {
     function __construct($iUid,$iUfn,$iUln,$iUem,$iUtp,&$iLoaderBar) {
         global $CFG;
         $this->callback=false;
-        $this->apiurl=$CFG->turnitin_apiurl;
-        $this->accountid=$CFG->turnitin_account_id;
+        $this->apiurl=isset($CFG->turnitin_apiurl) ? $CFG->turnitin_apiurl : "";
+        $this->accountid=isset($CFG->turnitin_account_id) ? $CFG->turnitin_account_id : 0;
         $this->uid=$iUid;
 
         // Convert the email, firstname and lastname to psuedos for students if the option is set in config
@@ -467,7 +467,7 @@ class turnitintool_commclass {
      */
     function doLogging($vars,$result) {
         global $CFG;
-        if ( $CFG->turnitin_enablediagnostic AND !empty( $vars ) ) {
+        if ( isset($CFG->turnitin_enablediagnostic) && $CFG->turnitin_enablediagnostic AND !empty( $vars ) ) {
             $this->result=$result;
             // ###### DELETE SURPLUS LOGS #########
             $numkeeps=10;
