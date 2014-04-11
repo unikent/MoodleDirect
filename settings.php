@@ -10,7 +10,7 @@ if ($ADMIN->fulltree) {
     require_once($CFG->dirroot.'/mod/turnitintool/lib.php');
     require_once($CFG->dirroot.'/mod/turnitintool/version.php');
 
-    $upgrade = turnitintool_updateavailable( $module );
+    $upgrade = turnitintool_updateavailable( $plugin );
     $upgradeavailable = ( is_null( $upgrade ) ) ? '' : ' <a href="'.$upgrade.'"><i><b>'.get_string('upgradeavailable','turnitintool').'</b></i></a> ';
 
     $toplinks = '<div><a href="'.$CFG->wwwroot.'/mod/turnitintool/extras.php">'.get_string("connecttest", "turnitintool")
@@ -23,7 +23,7 @@ if ($ADMIN->fulltree) {
         $toplinks .= '</a> | <a href="'.$CFG->wwwroot.'/mod/turnitintool/extras.php?do=files">'.get_string("files", "turnitintool");
     }
 
-    $toplinks .= '</a> - ('.get_string('moduleversion','turnitintool').': '.( isset( $module->version ) ? $module->version : $module->versiondb ) . $upgradeavailable . ')</div>';
+    $toplinks .= '</a> - ('.get_string('moduleversion','turnitintool').': '.( isset( $plugin->version ) ? $plugin->version : $plugin->versiondb ) . $upgradeavailable . ')</div>';
 
     $settings->add(new admin_setting_heading('turnitin_header', '', $toplinks));
 

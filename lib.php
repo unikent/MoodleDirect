@@ -7318,14 +7318,14 @@ function turnitintool_istutor( $email ) {
     *
     * @return string url of latest if this version is not the latest null if update is not available
     */
-function turnitintool_updateavailable( $module ) {
+function turnitintool_updateavailable( $plugin ) {
     $basedir = "https://www.turnitin.com/static/resources/files/";
     $loaderbar = null;
     // Use the comms class so we can make sure the call is using any proxy in place
     $tii = new turnitintool_commclass('','','','','',$loaderbar);
     $result = $tii->doRequest("GET", $basedir . "moodledirect_latest.xml", "");
     $tii->xmlToSimple( $result, false );
-    $moduleversion = ( isset( $module->version ) ) ? $module->version : $module->versiondb;
+    $moduleversion = ( isset( $plugin->version ) ) ? $plugin->version : $plugin->versiondb;
     if ( strlen( $result ) > 0 AND isset( $tii->simplexml->version ) ) {
         $version = $tii->simplexml->version;
         if ( $version <= $moduleversion ) {
