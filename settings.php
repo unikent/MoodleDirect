@@ -7,10 +7,10 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
 
-    $plugin = new stdClass();
-
     require_once($CFG->dirroot.'/mod/turnitintool/lib.php');
-    require_once($CFG->dirroot.'/mod/turnitintool/version.php');
+
+    $plugin = new stdClass();
+    @include($CFG->dirroot.'/mod/turnitintool/version.php');
 
     $upgrade = turnitintool_updateavailable( $plugin );
     $upgradeavailable = ( is_null( $upgrade ) ) ? '' : ' <a href="'.$upgrade.'"><i><b>'.get_string('upgradeavailable','turnitintool').'</b></i></a> ';
