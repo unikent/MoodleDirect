@@ -460,6 +460,22 @@ function xmldb_turnitintool_upgrade($oldversion) {
         }
     }
 
+    if ($result && $oldversion < 2013111405) {
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('turnitintool_submissions');
+        $index = new xmldb_index('submissionobjectid', XMLDB_INDEX_NOTUNIQUE, array('submission_objectid'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('submissionpart', XMLDB_INDEX_NOTUNIQUE, array('submission_part'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, 2013111405, 'turnitintool');
+    }
+
     return $result;
 }
 
