@@ -775,7 +775,10 @@ function turnitintool_refresh_events($courseid=0) {
         foreach ($parts as $part) {
             $event->timestart=$part->dtdue;
 
-            if ($events = turnitintool_get_record_select('event', "modulename='turnitintool' AND instance=".$turnitintool->id." AND name='".$turnitintool->name." - ".$part->partname."'")) {
+            if ($events = turnitintool_get_record_select('event', "modulename='turnitintool' AND instance=:id AND name=:name", array(
+                "id" => $turnitintool->id,
+                "name" => $turnitintool->name." - ".$part->partname
+            ))) {
                 $event->id = $events->id;
                 update_event($event);
             } else {
@@ -856,8 +859,11 @@ function turnitintool_print_overview($courses, &$htmlarray) {
                 $input->gplural=($numgrades!=1) ? 's' : '';
                 $partsarray[$part->id]['status']=get_string('tutorstatus','turnitintool',$input);
             } else { // If user is a student
-                if ($submission=turnitintool_get_record_select('turnitintool_submissions','turnitintoolid='.$turnitintool->id.
-                ' AND submission_part='.$part->id.' AND userid='.$USER->id.' AND submission_objectid IS NOT NULL')) {
+                if ($submission=turnitintool_get_record_select('turnitintool_submissions','turnitintoolid=:ttid AND submission_part=:pid AND userid=:uid AND submission_objectid IS NOT NULL', array(
+                    "ttid" => $turnitintool->id,
+                    "pid" => $part->id,
+                    "uid" => $USER->id
+                ))) {
 
                     $input = new stdClass();
                     $input->modified=userdate($submission->submission_modified,get_string('strftimedatetimeshort','langconfig'));
@@ -1344,7 +1350,10 @@ function turnitintool_update_partnames($cm,$turnitintool,$post) {
                 turnitintool_print_error('partdberror','turnitintool',NULL,NULL,__FILE__,__LINE__);
             }
 
-            if ($events = turnitintool_get_record_select('event', "modulename='turnitintool' AND instance='".$turnitintool->id."' AND name='".$currentevent."'")) {
+            if ($events = turnitintool_get_record_select('event', "modulename='turnitintool' AND instance=:id AND name=:name", array(
+                "id" => $turnitintool->id,
+                "name" => $currentevent
+            ))) {
                 $event->id = $events->id;
                 update_event($event);
             }
@@ -1589,7 +1598,9 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
 
     $exportdisabled=false;
     // Get the post date for the last available part
-    if (!$part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid='.$turnitintool->id.' AND deleted = 0',NULL,'max(dtpost) AS dtpost')) {
+    if (!$part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid=:id AND deleted = 0',NULL,'max(dtpost) AS dtpost', array(
+        "id" => $turnitintool->id
+    ))) {
         turnitintool_print_error('partgeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
         exit();
     } else if ( $part->dtpost > time() AND $turnitintool->anon > 0 ) {
@@ -1598,7 +1609,9 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
     }
 
     // Get the start date for the first available part
-    if (!$part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid='.$turnitintool->id.' AND deleted = 0',NULL,'min(dtstart) AS dtstart')) {
+    if (!$part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid=:id AND deleted = 0',NULL,'min(dtstart) AS dtstart', array(
+        "id" => $turnitintool->id
+    ))) {
         turnitintool_print_error('partgeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
         exit();
     }
@@ -1890,7 +1903,9 @@ function turnitintool_remove_tiitutor($cm,$turnitintool,$tutor) {
                         $post->new_teacher_email=(string)$tutorobj->email;
                         $tii->changeOwner($post,get_string('changingowner','turnitintool'));
                         unset($post->new_teacher_email);
-                        $newowner=turnitintool_get_record_select('user',"email='".$tutorobj->email."'");
+                        $newowner=turnitintool_get_record_select('user',"email=:email", array(
+                            "email" => $tutorobj->email
+                        ));
                         $tiicourse=turnitintool_get_record('turnitintool_courses','courseid',$turnitintool->course);
                         $tiicourse->ownerid=$newowner->id;
                         turnitintool_update_record('turnitintool_courses',$tiicourse);
@@ -4359,7 +4374,9 @@ function turnitintool_update_form_grades($cm,$turnitintool,$post) {
             turnitintool_print_error('submissiongeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
             exit();
         }
-        if (!$part=turnitintool_get_record_select('turnitintool_parts',"id=".$submission->submission_part." AND deleted=0")) {
+        if (!$part=turnitintool_get_record_select('turnitintool_parts',"id=:id AND deleted=0",array(
+                "id" => $submission->submission_part
+            ))) {
             turnitintool_print_error('partgeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
             exit();
         }
