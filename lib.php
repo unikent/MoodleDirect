@@ -5010,8 +5010,8 @@ function turnitintool_view_submission_form($cm,$turnitintool,$submissionid=NULL)
 
         if ($turnitintool->allowlate==1) {
             $parts=turnitintool_get_records_select('turnitintool_parts',
-                    "turnitintoolid=:tid AND deleted=0 AND dtstart < '".time()."'", null,
-                    'dtstart,dtdue,dtpost,id', array("tid" => $turnitintool->id));
+                    "turnitintoolid=:tid AND deleted=0 AND dtstart < '".time()."'", array("tid" => $turnitintool->id),
+                    'dtstart,dtdue,dtpost,id');
         } else {
             $parts=turnitintool_get_records_select('turnitintool_parts',
                     "turnitintoolid=:tid AND deleted=0 AND dtstart < '".time()."' AND dtdue > '".time()."'", array("tid" => $turnitintool->id),'dtstart,dtdue,dtpost,id');
