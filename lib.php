@@ -1603,9 +1603,9 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
 
     $exportdisabled=false;
     // Get the post date for the last available part
-    if (!$part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid=:id AND deleted = 0',NULL,'max(dtpost) AS dtpost', array(
+    if (!$part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid=:id AND deleted = 0',array(
         "id" => $turnitintool->id
-    ))) {
+    ),'max(dtpost) AS dtpost')) {
         turnitintool_print_error('partgeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
         exit();
     } else if ( $part->dtpost > time() AND $turnitintool->anon > 0 ) {
@@ -1614,9 +1614,9 @@ function turnitintool_introduction($cm,$turnitintool,$notice='') {
     }
 
     // Get the start date for the first available part
-    if (!$part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid=:id AND deleted = 0',NULL,'min(dtstart) AS dtstart', array(
+    if (!$part=turnitintool_get_record_select('turnitintool_parts','turnitintoolid=:id AND deleted = 0',array(
         "id" => $turnitintool->id
-    ))) {
+    ),'min(dtstart) AS dtstart')) {
         turnitintool_print_error('partgeterror','turnitintool',NULL,NULL,__FILE__,__LINE__);
         exit();
     }
@@ -4932,9 +4932,9 @@ function turnitintool_cansubmit($cm,$turnitintool,$user) { // Returns an array o
         foreach ($partsavailable as $partavailable) {
             if (is_array($studentusers)) {
                 foreach ($studentusers as $studentuser) {
-                    $submitted=(!turnitintool_get_records_select('turnitintool_submissions','turnitintoolid=:tid AND submission_part=:spid AND userid=uid', array(
-                        "tid" => $turnitintool->id
-                        "spid" => $partavailable->id
+                    $submitted=(!turnitintool_get_records_select('turnitintool_submissions','turnitintoolid=:tid AND submission_part=:spid AND userid=:uid', array(
+                        "tid" => $turnitintool->id,
+                        "spid" => $partavailable->id,
                         "uid" => $studentuser->id
                     ))) ? 0 : 1;
                     
@@ -4952,8 +4952,8 @@ function turnitintool_cansubmit($cm,$turnitintool,$user) { // Returns an array o
     } else {
         foreach ($partsavailable as $partavailable) {
             $submitted=(!turnitintool_get_records_select('turnitintool_submissions','turnitintoolid=:tid AND submission_part=:spid AND userid=:uid', array(
-                "tid" => $turnitintool->id
-                "spid" => $partavailable->id
+                "tid" => $turnitintool->id,
+                "spid" => $partavailable->id,
                 "uid" => $user->id
             ))) ? 0 : 1;
             if (!$submitted // Student has made no submissions
@@ -5010,8 +5010,8 @@ function turnitintool_view_submission_form($cm,$turnitintool,$submissionid=NULL)
 
         if ($turnitintool->allowlate==1) {
             $parts=turnitintool_get_records_select('turnitintool_parts',
-                    "turnitintoolid=:tid AND deleted=0 AND dtstart < '".time()."'", null,
-                    'dtstart,dtdue,dtpost,id', array("tid" => $turnitintool->id));
+                    "turnitintoolid=:tid AND deleted=0 AND dtstart < '".time()."'", array("tid" => $turnitintool->id),
+                    'dtstart,dtdue,dtpost,id');
         } else {
             $parts=turnitintool_get_records_select('turnitintool_parts',
                     "turnitintoolid=:tid AND deleted=0 AND dtstart < '".time()."' AND dtdue > '".time()."'", array("tid" => $turnitintool->id),'dtstart,dtdue,dtpost,id');
