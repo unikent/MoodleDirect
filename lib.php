@@ -4932,7 +4932,7 @@ function turnitintool_cansubmit($cm,$turnitintool,$user) { // Returns an array o
         foreach ($partsavailable as $partavailable) {
             if (is_array($studentusers)) {
                 foreach ($studentusers as $studentuser) {
-                    $submitted=(!turnitintool_get_records_select('turnitintool_submissions','turnitintoolid=:tid AND submission_part=:spid AND userid=uid', array(
+                    $submitted=(!turnitintool_get_records_select('turnitintool_submissions','turnitintoolid=:tid AND submission_part=:spid AND userid=:uid', array(
                         "tid" => $turnitintool->id,
                         "spid" => $partavailable->id,
                         "uid" => $studentuser->id
