@@ -255,27 +255,17 @@ add_to_log($course->id, "turnitintool", "view", "view.php?id=$cm->id", "User vie
 $strturnitintools = get_string("modulenameplural", "turnitintool");
 $strturnitintool  = get_string("modulename", "turnitintool");
 
-if (!is_callable('build_navigation')) {
-    $navigation = array(
-            array('title' => $course->shortname, 'url' => $CFG->wwwroot."/course/view.php?id=$course->id", 'type' => 'course'),
-            array('title' => $strturnitintools, 'url' => $CFG->wwwroot."/mod/turnitintool/index.php?id=$course->id", 'type' => 'activity'),
-            array('title' => format_string($turnitintool->name), 'url' => '', 'type' => 'activityinstance')
-    );
-} else {
-    $navigation = build_navigation('',$cm);
-}
-
 turnitintool_header($cm,
         $course,
         $_SERVER["REQUEST_URI"],
         $turnitintool->name,
         $SITE->fullname,
-        $navigation,
+        "",
         "",
         "",
         true,
         update_module_button($cm->id, $course->id, $strturnitintool),
-        navmenu($course)
+        ""
 );
 
 /// Check to see if groups are being used and abstract for 1.8 if neccessary
