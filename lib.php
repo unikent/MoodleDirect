@@ -80,8 +80,7 @@ function turnitintool_supports($feature) {
  * @return int intance id
  */
 function turnitintool_add_instance($turnitintool) {
-
-    global $USER,$CFG;
+    global $USER, $CFG;
 
     $turnitintool->timecreated = time();
 
@@ -246,6 +245,8 @@ function turnitintool_add_instance($turnitintool) {
             turnitintool_delete_records('turnitintool','id',$insertid);
             turnitintool_print_error('partdberror','turnitintool',NULL,$i,__FILE__,__LINE__);
         }
+    
+        require_once($CFG->dirroot . '/calendar/lib.php');
 
         $event = new object();
         $event->name        = $turnitintool->name.' - '.$part->partname;
@@ -258,7 +259,7 @@ function turnitintool_add_instance($turnitintool) {
         $event->eventtype   = 'due';
         $event->timestart   = $part->dtdue;
         $event->timeduration = 0;
-        add_event($event);
+        \calendar_event::create($event);
 
         // ]]]]
 
@@ -268,9 +269,6 @@ function turnitintool_add_instance($turnitintool) {
     $turnitintool->id = $insertid;
     turnitintool_grade_item_update( $turnitintool );
     // ]]]]
-
-    $cm=get_coursemodule_from_instance("turnitintool", $turnitintool->id, $turnitintool->course);
-    add_to_log($turnitintool->course, "turnitintool", "add turnitintool", 'view.php?id='.$cm->id, "Assignment created '$turnitintool->name'", $cm->id);
 
     $tii->endSession();
     return $insertid;
