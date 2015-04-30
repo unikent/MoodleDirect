@@ -27,17 +27,10 @@ class mod_turnitintool_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maxlength','turnitintool',$input), 'maxlength', 40, 'client');
         $mform->addRule('name', get_string('maxlength','turnitintool',$input), 'maxlength', 40, 'server');
 
-        if (is_callable(array($this,'add_intro_editor'))) {
-            $this->add_intro_editor(true, get_string('turnitintoolintro', 'turnitintool'));
+        if (method_exists($this, 'standard_intro_elements')) {
+            $this->standard_intro_elements(get_string('turnitintoolintro', 'turnitintool'));
         } else {
-            $mform->addElement('htmleditor', 'intro', get_string('turnitintoolintro', 'turnitintool'));
-            $mform->setType('intro', PARAM_RAW);
-            $mform->addRule('intro', get_string('required'), 'required', null, 'client');
-            $input = new stdClass();
-            $input->length=1000;
-            $input->field=get_string('turnitintoolintro','turnitintool');
-            $mform->addRule('intro', get_string('maxlength','turnitintool',$input), 'maxlength', 1000, 'client');
-            $mform->addRule('intro', get_string('maxlength','turnitintool',$input), 'maxlength', 1000, 'server');
+            $this->add_intro_editor(true, get_string('turnitintoolintro', 'turnitintool'));
         }
 
         $typeoptions = turnitintool_filetype_array();
