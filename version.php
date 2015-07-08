@@ -7,7 +7,7 @@
 if (!isset($plugin)) {
     $plugin = new stdClass();
 }
-$plugin->version  = 2015030301;  // The current module version (Date: YYYYMMDDXX)
+$plugin->version  = 2015030302;  // The current module version (Date: YYYYMMDDXX)
 $plugin->component = 'mod_turnitintool';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->cron     = 1800;        // Period for cron to check this module (secs)

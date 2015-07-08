@@ -4,14 +4,15 @@
  * @copyright 2012 Turnitin
  */
 
-require_once(dirname(__FILE__) . "/../../config.php");
-require_once(dirname(__FILE__) . "/lib.php");
-require_once($CFG->libdir . "/formslib.php");
-require_once($CFG->libdir . "/form/text.php");
-require_once($CFG->libdir . "/form/datetimeselector.php");
-require_once($CFG->libdir . "/form/hidden.php");
-require_once($CFG->libdir . "/form/button.php");
-require_once($CFG->libdir . "/form/submit.php");
+require_once(__DIR__."/../../config.php");
+require_once(__DIR__."/lib.php");
+require_once($CFG->libdir."/formslib.php");
+require_once($CFG->libdir."/form/text.php");
+require_once($CFG->libdir."/form/datetimeselector.php");
+require_once($CFG->libdir."/form/hidden.php");
+require_once($CFG->libdir."/form/button.php");
+require_once($CFG->libdir."/form/submit.php");
+require_once(__DIR__."/version.php");
 
 if (!turnitintool_check_config()) {
     turnitintool_print_error('configureerror','turnitintool',NULL,NULL,__FILE__,__LINE__);

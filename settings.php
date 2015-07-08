@@ -82,8 +82,50 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading('turnitin_privacy', get_string('studentdataprivacy','turnitintool'),
                        get_string('studentdataprivacy_desc', 'turnitintool')));
 
-    $settings->add(new admin_setting_configselect('turnitin_enablepseudo', get_string('enablepseudo', 'turnitintool'),
-                   get_string('enablepseudo_desc', 'turnitintool'), 0, array( 0 => get_string('no', 'turnitintool') ) ));
+    if ( turnitintool_count_records_select( 'turnitintool_users' ) > 0 AND isset( $CFG->turnitin_enablepseudo ) ) {
+        $selectionarray = ( $CFG->turnitin_enablepseudo == 1 ) ? array( 1 => get_string('yes', 'turnitintool') ) : array( 0 => get_string('no', 'turnitintool') );
+        $pseudoselect = new admin_setting_configselect('turnitin_enablepseudo', get_string('enablepseudo', 'turnitintool'),
+                       get_string('enablepseudo_desc', 'turnitintool'), 0, $selectionarray);
+        $pseudoselect->nosave = true;
+    } else if ( turnitintool_count_records_select( 'turnitintool_users' ) > 0 ) {
+        $pseudoselect = new admin_setting_configselect('turnitin_enablepseudo', get_string('enablepseudo', 'turnitintool'),
+                       get_string('enablepseudo_desc', 'turnitintool'), 0, array( 0 => get_string('no', 'turnitintool') ) );
+    } else {
+        $pseudoselect = new admin_setting_configselect('turnitin_enablepseudo', get_string('enablepseudo', 'turnitintool'),
+                       get_string('enablepseudo_desc', 'turnitintool'), 0, $options);
+    }
+
+    $settings->add( $pseudoselect );
+
+    if ( isset( $CFG->turnitin_enablepseudo ) AND $CFG->turnitin_enablepseudo ) {
+
+        $CFG->turnitin_pseudofirstname = ( isset( $CFG->turnitin_pseudofirstname ) )
+                ? $CFG->turnitin_pseudofirstname : get_string('defaultcoursestudent');
+
+        $settings->add(new admin_setting_configtext('turnitin_pseudofirstname', get_string('pseudofirstname', 'turnitintool'),
+                        get_string('pseudofirstname_desc', 'turnitintool'), get_string('defaultcoursestudent')));
+
+        $lnoptions = array( 0 => get_string('user') );
+
+        $user_profiles = turnitintool_get_records( 'user_info_field' );
+        foreach ( $user_profiles as $profile ) {
+            $lnoptions[ $profile->id ] = get_string( 'profilefield', 'admin' ) . ': ' . $profile->name;
+        }
+
+        $settings->add(new admin_setting_configselect('turnitin_pseudolastname', get_string('pseudolastname', 'turnitintool'),
+                        get_string('pseudolastname_desc', 'turnitintool'), 0, $lnoptions));
+
+        $settings->add(new admin_setting_configselect('turnitin_lastnamegen', get_string('psuedolastnamegen', 'turnitintool'),
+                        get_string('psuedolastnamegen_desc', 'turnitintool' ), 0, $options));
+
+        $settings->add(new admin_setting_configtext('turnitin_pseudosalt', get_string('pseudoemailsalt', 'turnitintool'),
+                        get_string('pseudoemailsalt_desc', 'turnitintool'), ''));
+
+        $settings->add(new admin_setting_configtext('turnitin_pseudoemaildomain', get_string('pseudoemaildomain', 'turnitintool'),
+                        get_string('pseudoemaildomain_desc', 'turnitintool'), ''));
+
+    }
+
 
     // Following are default values for new instance
 
