@@ -476,6 +476,24 @@ function xmldb_turnitintool_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2013111405, 'turnitintool');
     }
 
+    if ($result && $oldversion < 2015072200) {
+        if (is_callable(array($DB,'get_manager'))) {
+            $dbman=$DB->get_manager();
+            $table = new xmldb_table('turnitintool');
+            $field = new xmldb_field('needs_updating', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'transmatch');
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        } else {
+            $table = new XMLDBTable('turnitintool');
+            $field = new XMLDBField('needs_updating');
+            $field->setAttributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, 0, 'transmatch');
+            $result = $result && add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2015072200, 'turnitintool');
+    }
+
     return $result;
 }
 
